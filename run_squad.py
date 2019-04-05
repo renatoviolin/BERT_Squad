@@ -586,70 +586,71 @@ def _check_is_max_context(doc_spans, cur_span_index, position):
 
 #   return (start_logits, end_logits)
 
-  def create_model(bert_config, is_training, input_ids, input_mask, segment_ids,
-                 use_one_hot_embeddings):
-  """Creates a classification model."""
-  model = modeling.BertModel(
-      config=bert_config,
-      is_training=is_training,
-      input_ids=input_ids,
-      input_mask=input_mask,
-      token_type_ids=segment_ids,
-      use_one_hot_embeddings=use_one_hot_embeddings)
+def create_model(bert_config, is_training, input_ids, input_mask, segment_ids,
+                use_one_hot_embeddings):
 
-  final_hidden = model.get_sequence_output()
+"""Creates a classification model."""
+model = modeling.BertModel(
+    config=bert_config,
+    is_training=is_training,
+    input_ids=input_ids,
+    input_mask=input_mask,
+    token_type_ids=segment_ids,
+    use_one_hot_embeddings=use_one_hot_embeddings)
 
-  final_hidden_shape = modeling.get_shape_list(final_hidden, expected_rank=3)
-  batch_size = final_hidden_shape[0]
-  seq_length = final_hidden_shape[1]
-  hidden_size = final_hidden_shape[2]
+final_hidden = model.get_sequence_output()
 
-  W1 = tf.get_variable(
-      "cls/squad/output_weights1", [768, hidden_size],
-      initializer=tf.truncated_normal_initializer(stddev=0.02))
+final_hidden_shape = modeling.get_shape_list(final_hidden, expected_rank=3)
+batch_size = final_hidden_shape[0]
+seq_length = final_hidden_shape[1]
+hidden_size = final_hidden_shape[2]
 
-  b1 = tf.get_variable(
-      "cls/squad/output_bias1", [768], initializer=tf.zeros_initializer())
+W1 = tf.get_variable(
+    "cls/squad/output_weights1", [768, hidden_size],
+    initializer=tf.truncated_normal_initializer(stddev=0.02))
 
-  W2 = tf.get_variable(
-      "cls/squad/output_weights2", [384, 768],
-      initializer=tf.truncated_normal_initializer(stddev=0.02))
+b1 = tf.get_variable(
+    "cls/squad/output_bias1", [768], initializer=tf.zeros_initializer())
 
-  b2 = tf.get_variable(
-      "cls/squad/output_bias2", [384], initializer=tf.zeros_initializer())
+W2 = tf.get_variable(
+    "cls/squad/output_weights2", [384, 768],
+    initializer=tf.truncated_normal_initializer(stddev=0.02))
 
-  W3 = tf.get_variable(
-      "cls/squad/output_weights3", [2, 384],
-      initializer=tf.truncated_normal_initializer(stddev=0.02))
+b2 = tf.get_variable(
+    "cls/squad/output_bias2", [384], initializer=tf.zeros_initializer())
 
-  b3 = tf.get_variable(
-      "cls/squad/output_bias3", [2], initializer=tf.zeros_initializer())
+W3 = tf.get_variable(
+    "cls/squad/output_weights3", [2, 384],
+    initializer=tf.truncated_normal_initializer(stddev=0.02))
 
-  final_hidden_matrix = tf.reshape(final_hidden,
-                                   [batch_size * seq_length, hidden_size])
+b3 = tf.get_variable(
+    "cls/squad/output_bias3", [2], initializer=tf.zeros_initializer())
 
-    
+final_hidden_matrix = tf.reshape(final_hidden,
+                                  [batch_size * seq_length, hidden_size])
+
   
-  logits = tf.matmul(final_hidden_matrix, W1, transpose_b=True)
-  logits = tf.nn.bias_add(logits, b1)
-  tf.nn.relu(logits)
 
-  logits = tf.matmul(logits, W2, transpose_b=True)
-  logits = tf.nn.bias_add(logits, b2)
-  tf.nn.relu(logits)
+logits = tf.matmul(final_hidden_matrix, W1, transpose_b=True)
+logits = tf.nn.bias_add(logits, b1)
+tf.nn.relu(logits)
 
-  logits = tf.matmul(logits, W3, transpose_b=True)
-  logits = tf.nn.bias_add(logits, b3)
-  # tf.nn.relu(logits)
-    
-  logits = tf.reshape(logits, [batch_size, seq_length, 2])
-  logits = tf.transpose(logits, [2, 0, 1])
+logits = tf.matmul(logits, W2, transpose_b=True)
+logits = tf.nn.bias_add(logits, b2)
+tf.nn.relu(logits)
 
-  unstacked_logits = tf.unstack(logits, axis=0)
+logits = tf.matmul(logits, W3, transpose_b=True)
+logits = tf.nn.bias_add(logits, b3)
+# tf.nn.relu(logits)
+  
+logits = tf.reshape(logits, [batch_size, seq_length, 2])
+logits = tf.transpose(logits, [2, 0, 1])
 
-  (start_logits, end_logits) = (unstacked_logits[0], unstacked_logits[1])
+unstacked_logits = tf.unstack(logits, axis=0)
 
-  return (start_logits, end_logits)
+(start_logits, end_logits) = (unstacked_logits[0], unstacked_logits[1])
+
+return (start_logits, end_logits)
 
 
 def model_fn_builder(bert_config, init_checkpoint, learning_rate,
