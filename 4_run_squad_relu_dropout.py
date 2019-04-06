@@ -660,7 +660,7 @@ def create_model(bert_config, is_training, input_ids, input_mask, segment_ids,
     
   logits = tf.matmul(logits, W4, transpose_b=True)
   logits = tf.nn.bias_add(logits, b4)
-  tf.nn.relu(logits)
+  # tf.nn.relu(logits)
   logits = tf.nn.dropout(logits, keep_prob)
 
   logits = tf.reshape(logits, [batch_size, seq_length, 2])
