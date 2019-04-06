@@ -609,9 +609,9 @@ def create_model(bert_config, is_training, input_ids, input_mask, segment_ids,
   if is_training:
     keep_prob = 0.8
 
-    W1 = tf.get_variable(
-      "cls/squad/output_weights1", [768, hidden_size],
-      initializer=tf.truncated_normal_initializer(stddev=0.02))
+  W1 = tf.get_variable(
+    "cls/squad/output_weights1", [768, hidden_size],
+    initializer=tf.truncated_normal_initializer(stddev=0.02))
 
   b1 = tf.get_variable(
       "cls/squad/output_bias1", [768], initializer=tf.zeros_initializer())
