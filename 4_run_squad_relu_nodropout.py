@@ -609,7 +609,7 @@ def create_model(bert_config, is_training, input_ids, input_mask, segment_ids,
   if is_training:
     keep_prob = 0.8
 
-  W1 = tf.get_variable(
+    W1 = tf.get_variable(
       "cls/squad/output_weights1", [768, hidden_size],
       initializer=tf.truncated_normal_initializer(stddev=0.02))
 
@@ -617,38 +617,52 @@ def create_model(bert_config, is_training, input_ids, input_mask, segment_ids,
       "cls/squad/output_bias1", [768], initializer=tf.zeros_initializer())
 
   W2 = tf.get_variable(
-      "cls/squad/output_weights2", [384, 768],
+      "cls/squad/output_weights2", [512, 768],
       initializer=tf.truncated_normal_initializer(stddev=0.02))
 
   b2 = tf.get_variable(
-      "cls/squad/output_bias2", [384], initializer=tf.zeros_initializer())
+      "cls/squad/output_bias2", [512], initializer=tf.zeros_initializer())
 
   W3 = tf.get_variable(
-      "cls/squad/output_weights3", [2, 384],
+      "cls/squad/output_weights3", [192, 512],
       initializer=tf.truncated_normal_initializer(stddev=0.02))
 
   b3 = tf.get_variable(
-      "cls/squad/output_bias3", [2], initializer=tf.zeros_initializer())
+      "cls/squad/output_bias3", [192], initializer=tf.zeros_initializer())
+
+
+  W4 = tf.get_variable(
+      "cls/squad/output_weights4", [2, 192],
+      initializer=tf.truncated_normal_initializer(stddev=0.02))
+
+  b4 = tf.get_variable(
+      "cls/squad/output_bias4", [2], initializer=tf.zeros_initializer())
 
   final_hidden_matrix = tf.reshape(final_hidden,
-                                    [batch_size * seq_length, hidden_size])
+                                   [batch_size * seq_length, hidden_size])
 
     
-
+  
   logits = tf.matmul(final_hidden_matrix, W1, transpose_b=True)
   logits = tf.nn.bias_add(logits, b1)
-  # tf.nn.tanh(logits)
-  logits = tf.nn.dropout(logits, keep_prob)
+  tf.nn.relu(logits)
+#   logits = tf.nn.dropout(logits, keep_prob)
 
   logits = tf.matmul(logits, W2, transpose_b=True)
   logits = tf.nn.bias_add(logits, b2)
-  # tf.nn.tanh(logits)
-  logits = tf.nn.dropout(logits, keep_prob)
+  tf.nn.relu(logits)
+#   logits = tf.nn.dropout(logits, keep_prob)
 
   logits = tf.matmul(logits, W3, transpose_b=True)
   logits = tf.nn.bias_add(logits, b3)
-  # tf.nn.tanh(logits)
-  
+  tf.nn.relu(logits)
+#   logits = tf.nn.dropout(logits, keep_prob)
+    
+  logits = tf.matmul(logits, W4, transpose_b=True)
+  logits = tf.nn.bias_add(logits, b4)
+  tf.nn.relu(logits)
+#   logits = tf.nn.dropout(logits, keep_prob)
+
   logits = tf.reshape(logits, [batch_size, seq_length, 2])
   logits = tf.transpose(logits, [2, 0, 1])
 
