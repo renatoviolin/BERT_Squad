@@ -1,6 +1,6 @@
 export BERT_BASE_DIR=/home/renato/BERT_Squad/uncased_L-12_H-768_A-12
 export SQUAD_DIR=/home/renato/BERT_Squad/squad
-export OUTPUT_DIR_V2=/home/renato/BERT_Squad/output_v2
+export OUTPUT_DIR=/home/renato/BERT_Squad/output_no_dropout
 
 python run_squad_relu_nodropout.py \
   --vocab_file=$BERT_BASE_DIR/vocab.txt \
@@ -12,8 +12,8 @@ python run_squad_relu_nodropout.py \
   --predict_file=$SQUAD_DIR/dev-v2.0.json \
   --train_batch_size=12 \
   --learning_rate=3e-5 \
-  --num_train_epochs=2.0 \
+  --num_train_epochs=3.0 \
   --max_seq_length=384 \
   --doc_stride=128 \
-  --output_dir=$OUTPUT_DIR_V2 \
+  --output_dir=$OUTPUT_DIR \
   --version_2_with_negative=True
