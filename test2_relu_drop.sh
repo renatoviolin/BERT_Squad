@@ -5,7 +5,7 @@ export OUTPUT_DIR_V2=/home/renato/BERT_Squad/output_v2
 python run_squad_relu_dropout.py \
   --vocab_file=$BERT_BASE_DIR/vocab.txt \
   --bert_config_file=$BERT_BASE_DIR/bert_config.json \
-  --init_checkpoint=$OUTPUT_DIR_V2/model.ckpt-10859 \
+  --init_checkpoint=$OUTPUT_DIR_V2/bert_model.ckpt \
   --do_train=False \
   --train_file=$SQUAD_DIR/train-v2.0.json \
   --do_predict=True \
