@@ -14,6 +14,8 @@ wget -P squad/ -c https://rajpurkar.github.io/SQuAD-explorer/dataset/dev-v1.1.js
 wget -c https://github.com/allenai/bi-att-flow/blob/master/squad/evaluate-v1.1.py
 wget -O evaluate-v2.0.py https://worksheets.codalab.org/rest/bundles/0x6b567e1cf2e041ec80d7098f031c5c9e/contents/blob/
 
+mkdir eval_dev
+mkdir eval_train
 # Download repositorio
 # git clone https://github.com/renatoviolin/BERT_Squad
 
